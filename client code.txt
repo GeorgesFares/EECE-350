@@ -1,0 +1,34 @@
+import socket
+import datetime
+
+PROXY_ADDRESS = '127.0.0.1'  # Change this to the IP address of your proxy server
+PROXY_PORT = 12345
+
+# Take the website IP as input
+destination_address = input('Enter the website IP address: ')
+
+# Create a TCP/IP socket
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# Connect to the proxy server
+client_socket.connect((PROXY_ADDRESS, PROXY_PORT))
+
+# Send the request to the proxy server
+request = b'GET / HTTP/1.1\r\nHost: ' + destination_address.encode() + b'\r\nX-Physical-Address: F0-9E-4A-CE-91-72\r\n\r\n'
+client_socket.sendall(request)
+print('Sent request to', PROXY_ADDRESS, 'at', datetime.datetime.now())
+
+# Receive the reply back from the proxy server
+response = b''
+while True:
+    data = client_socket.recv(4096)
+    if not data:
+        break
+    response += data
+print('Received response from', PROXY_ADDRESS, 'at', datetime.datetime.now())
+
+# Print the response
+print(response.decode())
+
+# Close the connection
+client_socket.close()
